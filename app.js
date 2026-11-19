@@ -1,15 +1,4 @@
-const pontos = {
-  quente: {
-    titulo: "Ovo quente",
-    tempos: [3, 4],
-    aviso: "Retire o ovo com uma escumadeira e sirva enquanto está quente.",
-  },
-  duro: {
-    titulo: "Ovo duro",
-    tempos: [6, 7, 8, 9, 10],
-    aviso: "Retire o ovo da panela e mergulhe em água fria antes de descascar.",
-  },
-};
+const { pontos, carregarHistorico, tempoSugerido, salvarAvaliacao, formatarDuracao, opcoesDeTempo } = Ovinho;
 
 const telas = document.querySelectorAll(".painel > section");
 const duracao = document.getElementById("duracao");
@@ -23,34 +12,6 @@ let audio;
 let pontoId;
 let inicioPreparo;
 let preparoConcluido;
-const chaveHistorico = "ovinho.historico.v1";
-const ajustes = { "no-ponto": 0, "mais-passado": -30, "menos-passado": 30 };
-
-function lerHistorico() {
-  const dados = JSON.parse(localStorage.getItem(chaveHistorico) || "[]");
-  if (!Array.isArray(dados) || !dados.every(registro =>
-    typeof registro.id === "string" &&
-    Object.hasOwn(pontos, registro.ponto) &&
-    Number.isFinite(registro.segundos) && registro.segundos > 0 &&
-    Object.hasOwn(ajustes, registro.avaliacao) &&
-    typeof registro.data === "string"
-  )) throw new Error("Histórico inválido");
-  return dados;
-}
-
-function tempoSugerido(registro) {
-  const tempos = pontos[registro.ponto].tempos;
-  return Math.max(tempos[0] * 60, Math.min(
-    tempos[tempos.length - 1] * 60,
-    registro.segundos + ajustes[registro.avaliacao]
-  ));
-}
-
-function formatarDuracao(segundos) {
-  const minutos = Math.floor(segundos / 60);
-  const resto = segundos % 60;
-  return minutos + " min" + (resto ? " " + resto + " s" : "");
-}
 
 function mostrarTela(id) {
   for (const tela of telas) tela.hidden = tela.id !== id;
@@ -61,24 +22,26 @@ function prepararPonto(id) {
   pontoId = id;
   ponto = pontos[id];
   document.getElementById("ponto-escolhido").textContent = ponto.titulo;
-  duracao.replaceChildren(...ponto.tempos.map(minutos => new Option(minutos + " min", minutos)));
-  duracao.selectedIndex = ponto.tempos.length - 1;
   const sugestao = document.getElementById("sugestao-tempo");
-  sugestao.textContent = "Você pode ajustar o tempo antes de continuar.";
+  let segundos;
+  let aviso = "";
   try {
-    const historico = lerHistorico();
-    const ultimo = historico.filter(registro => registro.ponto === id).at(-1);
-    if (!ultimo) return;
-    const segundos = tempoSugerido(ultimo);
-    if (!ponto.tempos.includes(segundos / 60)) {
-      duracao.add(new Option(formatarDuracao(segundos), segundos / 60));
+    const historico = carregarHistorico(localStorage);
+    const ultimo = historico.registros.filter(registro => registro.ponto === id).at(-1);
+    if (ultimo) segundos = tempoSugerido(ultimo);
+    if (historico.ilegivel || historico.descartados) {
+      aviso = " Parte do histórico salvo estava ilegível e foi ignorada.";
     }
-    duracao.value = String(segundos / 60);
-    sugestao.textContent = "Sugestão para você: " + formatarDuracao(segundos) +
-      ", com base na sua última avaliação deste ponto. Você pode ajustar.";
   } catch {
-    sugestao.textContent = "Não foi possível ler seu histórico. Escolha o tempo para este preparo.";
+    aviso = " Não foi possível ler seu histórico neste navegador.";
   }
+  const tempos = opcoesDeTempo(ponto, segundos);
+  duracao.replaceChildren(...tempos.map(valor => new Option(formatarDuracao(valor), valor)));
+  duracao.value = String(segundos ?? tempos[tempos.length - 1]);
+  sugestao.textContent = segundos === undefined
+    ? "Você pode ajustar o tempo antes de continuar." + aviso
+    : "Sugestão para você: " + formatarDuracao(segundos) +
+      ", com base na sua última avaliação deste ponto. Você pode ajustar." + aviso;
 }
 
 function pararContagem() {
@@ -143,8 +106,7 @@ function atualizarContagem() {
 function iniciarContagem() {
   pararContagem();
   prepararAudio();
-  const minutos = Number(duracao.value);
-  progresso.max = minutos * 60;
+  progresso.max = Number(duracao.value);
   fim = Date.now() + progresso.max * 1000;
   intervalo = setInterval(atualizarContagem, 250);
   atualizarContagem();
@@ -152,7 +114,7 @@ function iniciarContagem() {
 
 document.getElementById("coloquei").addEventListener("click", () => {
   inicioPreparo = Date.now();
-  document.getElementById("modo-temporizador").textContent = ponto.titulo + " · " + formatarDuracao(Number(duracao.value) * 60);
+  document.getElementById("modo-temporizador").textContent = ponto.titulo + " · " + formatarDuracao(Number(duracao.value));
   iniciarContagem();
   mostrarTela("temporizador");
 });
@@ -164,12 +126,7 @@ document.getElementById("avaliacao").addEventListener("click", evento => {
   if (!botao || !preparoConcluido || evento.currentTarget.disabled) return;
   const retorno = document.getElementById("retorno-avaliacao");
   try {
-    const historico = lerHistorico();
-    const registro = { ...preparoConcluido, avaliacao: botao.dataset.avaliacao };
-    if (!historico.some(item => item.id === registro.id)) {
-      historico.push(registro);
-      localStorage.setItem(chaveHistorico, JSON.stringify(historico));
-    }
+    const { registro } = salvarAvaliacao(localStorage, preparoConcluido, botao.dataset.avaliacao);
     evento.currentTarget.disabled = true;
     retorno.textContent = "Avaliação salva! No próximo preparo deste ponto, vou sugerir " +
       formatarDuracao(tempoSugerido(registro)) + ".";

@@ -84,7 +84,7 @@ button { color: inherit; cursor: pointer; }
 }
 .primario { background: var(--gema); border-color: #c37b20; box-shadow: 0 3px 0 #b36b18; }
 .primario:hover { background: #ffd475; }
-.secundario { background: white; border-color: var(--borda); }
+.secundario { background: white; border-color: #ad8566; }
 .discreto { margin-top: 10px; background: transparent; color: var(--suave); }
 .discreto:hover, .secundario:hover { background: #f8ebd8; }
 
@@ -98,7 +98,7 @@ button { color: inherit; cursor: pointer; }
   padding: 10px 12px;
   text-align: left;
   background: #fffdf7;
-  border: 1px solid var(--borda);
+  border: 1px solid #ad8566;
   border-radius: 15px;
 }
 .opcao:hover { background: #fff0cb; border-color: #c37b20; }
