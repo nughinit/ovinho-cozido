@@ -1,5 +1,9 @@
 {
   "name": "ovinho-cozido",
   "private": true,
-  "scripts": { "test": "node --test \"tests/*.test.js\"" }
+  "scripts": {
+    "test": "node --test \"tests/*.test.js\"",
+    "preparar": "node scripts/preparar-publicacao.js",
+    "deploy": "npm test && npm run preparar && wrangler deploy"
+  }
 }

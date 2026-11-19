@@ -5,3 +5,5 @@ node_modules/
 .env
 .env.*
 *.tar.gz
+_site/
+.wrangler/
