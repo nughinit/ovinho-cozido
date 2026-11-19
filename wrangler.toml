@@ -1,0 +1,6 @@
+name = "ovinho-cozido"
+compatibility_date = "2026-11-19"
+
+# Só arquivos estáticos; a pasta é gerada por scripts/preparar-publicacao.js
+[assets]
+directory = "./_site"

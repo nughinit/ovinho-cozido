@@ -44,3 +44,17 @@ A interface foi verificada manualmente, só pelo teclado, em Chromium, incluindo
 ## Demonstração publicada
 
 O workflow `.github/workflows/pages.yml` publica o app no GitHub Pages a cada push em `main`, depois de rodar os testes. Ele exige que Pages esteja habilitado em Settings → Pages (fonte: GitHub Actions), o que no plano gratuito requer repositório público.
+
+## Publicação no Cloudflare
+
+O app também é publicado como Worker de arquivos estáticos em https://ovinho-cozido.nughiniprojects.workers.dev.
+
+- `wrangler.toml` define o Worker `ovinho-cozido` e publica a pasta `_site`.
+- `scripts/preparar-publicacao.js` monta `_site` só com `index.html`, `style.css`, `app.js`, `logica.js` e `OVINHO_bg.png`. A pasta é gerada e não é versionada. Se o app passar a usar um arquivo novo, inclua-o na lista `ARQUIVOS` desse script (e no passo "Montar site" do workflow do Pages).
+- Para publicar, com o Wrangler instalado e logado (`wrangler login`):
+
+```
+npm run deploy
+```
+
+Esse comando roda os testes, prepara `_site` e executa `wrangler deploy`. Para só conferir sem publicar: `npm run preparar` e `wrangler deploy --dry-run`.
