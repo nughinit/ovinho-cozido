@@ -1,0 +1,118 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="Escolha o ponto do ovo e acompanhe o preparo com um temporizador.">
+  <meta name="theme-color" content="#fff9ed">
+  <title>Ovinho Cozido · Guia de preparo</title>
+  <link rel="stylesheet" href="style.css">
+  <script src="app.js" defer></script>
+</head>
+<body>
+  <svg class="sprites" aria-hidden="true">
+    <symbol id="ovo-mole" viewBox="0 0 100 112">
+      <path d="M50 5C30 5 9 43 9 68a41 41 0 0 0 82 0C91 43 70 5 50 5Z" fill="#fffdf8" stroke="#542b17" stroke-width="3"/>
+      <path d="M50 47c-14 0-26 11-26 25s11 23 24 23c13 0 14-9 22-12 11-5 6-18 1-25-5-7-12-11-21-11Z" fill="#ffab24"/>
+      <path d="M36 65c2-5 7-8 12-9" fill="none" stroke="#fff0a2" stroke-width="5" stroke-linecap="round"/>
+    </symbol>
+    <symbol id="ovo-firme" viewBox="0 0 100 112">
+      <path d="M50 5C30 5 9 43 9 68a41 41 0 0 0 82 0C91 43 70 5 50 5Z" fill="#fffdf8" stroke="#542b17" stroke-width="3"/>
+      <circle cx="50" cy="71" r="23" fill="#ffcd55"/>
+      <path d="M38 74h1m13-14h1m8 17h1m-16 5h1" stroke="#b96115" stroke-width="3" stroke-linecap="round"/>
+    </symbol>
+  </svg>
+  <main class="app">
+    <aside class="marca" aria-label="Ovinho Cozido">
+      <span class="marca-nome"><span aria-hidden="true">◉</span> OVINHO COZIDO</span>
+      <span class="marca-legenda">GUIA DE PREPARO</span>
+    </aside>
+
+    <div class="painel">
+      <section id="home" aria-labelledby="titulo-home">
+        <div class="hero" aria-hidden="true">
+          <svg><use href="#ovo-firme"></use></svg>
+          <svg><use href="#ovo-mole"></use></svg>
+        </div>
+        <p class="etapa">DO FOGÃO AO PRATO</p>
+        <h1 id="titulo-home" tabindex="-1">Seu ovo,<br>no ponto.</h1>
+        <p class="intro">Escolha como prefere a gema. O Ovinho te acompanha do primeiro passo até a hora de tirar o ovo da panela.</p>
+        <button class="btn primario" type="button" data-target="pagina_1">Começar <span aria-hidden="true">→</span></button>
+      </section>
+
+      <section id="pagina_1" aria-labelledby="titulo-ponto" hidden>
+        <p class="etapa">01 / 04 · PONTO</p>
+        <h2 id="titulo-ponto" tabindex="-1">Como você quer a gema?</h2>
+        <p class="intro">Escolha o ponto do ovo para começar o preparo.</p>
+        <div class="opcoes">
+          <button class="opcao" type="button" data-ponto="quente" data-target="agua">
+            <svg aria-hidden="true"><use href="#ovo-mole"></use></svg>
+            <span><strong>Ovo quente</strong><small>Gema mole</small></span>
+            <span class="tempo-opcao">3–4 min</span>
+          </button>
+          <button class="opcao" type="button" data-ponto="duro" data-target="agua">
+            <svg aria-hidden="true"><use href="#ovo-firme"></use></svg>
+            <span><strong>Ovo duro</strong><small>Gema firme</small></span>
+            <span class="tempo-opcao">6–10 min</span>
+          </button>
+        </div>
+        <button class="btn discreto" type="button" data-target="home">← Início</button>
+      </section>
+
+      <section id="agua" aria-labelledby="titulo-agua" hidden>
+        <p class="etapa">02 / 04 · ÁGUA</p>
+        <h2 id="titulo-agua" tabindex="-1">Coloque a água para ferver</h2>
+        <p class="intro">Use água suficiente para cobrir o ovo e deixar cerca de 2,5 cm acima dele. A quantidade depende do tamanho da panela. Leve só a água ao fogo e espere ferver.</p>
+        <div class="controle">
+          <label for="duracao">Tempo de cozimento <span id="ponto-escolhido"></span></label>
+          <select id="duracao"></select>
+        </div>
+        <p class="ajuda" id="sugestao-tempo"></p>
+        <button class="btn primario" type="button" data-target="ovo">Ferveu! <span aria-hidden="true">→</span></button>
+        <button class="btn discreto" type="button" data-target="pagina_1">← Trocar ponto</button>
+      </section>
+
+      <section id="ovo" aria-labelledby="titulo-ovo" hidden>
+        <p class="etapa">03 / 04 · OVO</p>
+        <h2 id="titulo-ovo" tabindex="-1">Coloque o ovo na panela</h2>
+        <p class="intro">Abaixe o fogo para manter a água borbulhando de leve. Com uma escumadeira, coloque o ovo com cuidado e adicione uma pitada de sal.</p>
+        <p class="nota">A contagem começa assim que você tocar em <strong>Coloquei</strong>.</p>
+        <label class="som"><input id="som" type="checkbox" checked> Tocar um aviso quando terminar</label>
+        <button class="btn primario" id="coloquei" type="button">Coloquei <span aria-hidden="true">→</span></button>
+        <button class="btn discreto" type="button" data-target="agua">← Voltar</button>
+      </section>
+
+      <section id="temporizador" aria-labelledby="titulo-temporizador" hidden>
+        <p class="etapa">04 / 04 · COZIMENTO</p>
+        <h2 id="titulo-temporizador" tabindex="-1">Ovo no fogo</h2>
+        <p class="intro" id="modo-temporizador"></p>
+        <div class="relogio">
+          <div id="contagem" role="timer" aria-label="Tempo restante">00:00</div>
+          <span>tempo restante</span>
+          <progress id="progresso" aria-label="Progresso do cozimento" max="1" value="0"></progress>
+        </div>
+        <button class="btn secundario" id="reiniciar" type="button">Reiniciar contagem</button>
+        <button class="btn discreto" type="button" data-target="pagina_1">Cancelar preparo</button>
+      </section>
+
+      <section id="pronto" aria-labelledby="titulo-pronto" hidden>
+        <div class="selo" aria-hidden="true">✓</div>
+        <p class="etapa">PREPARO CONCLUÍDO</p>
+        <h2 id="titulo-pronto" tabindex="-1">Tempo esgotado!</h2>
+        <p class="intro" id="orientacao-final"></p>
+        <fieldset id="avaliacao">
+          <legend>Depois de provar, como ficou para o seu gosto?</legend>
+          <div class="respostas">
+            <button class="btn secundario" type="button" data-avaliacao="no-ponto">No ponto · ficou bom!</button>
+            <button class="btn secundario" type="button" data-avaliacao="mais-passado">Mais passado do que eu gosto</button>
+            <button class="btn secundario" type="button" data-avaliacao="menos-passado">Menos passado do que eu gosto</button>
+          </div>
+        </fieldset>
+        <p class="ajuda">O histórico fica salvo neste navegador e ajuda a sugerir seu próximo tempo.</p>
+        <p id="retorno-avaliacao" role="status"></p>
+        <button class="btn primario" id="outro-ovo" type="button" data-target="pagina_1" hidden>Preparar outro ovo <span aria-hidden="true">→</span></button>
+      </section>
+    </div>
+  </main>
+</body>
+</html>
